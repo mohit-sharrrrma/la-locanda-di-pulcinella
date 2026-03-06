@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-pizza-red: #D32F2F;
+  --color-pizza-red-dark: #B71C1C;
+  --color-dough: #FDFBF7;
+  --color-basil: #2E7D32;
+  --color-ink: #1A1A1A;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-dough);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .font-serif {
+  font-family: var(--font-serif);
+}
