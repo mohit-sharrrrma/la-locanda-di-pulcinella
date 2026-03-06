@@ -16,7 +16,9 @@ import {
   Star,
   ChevronRight,
   Pizza,
-  Leaf
+  Leaf,
+  Search,
+  Filter
 } from 'lucide-react';
 
 export default function App() {
@@ -24,6 +26,8 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedPizza, setSelectedPizza] = useState<{name: string, desc: string, price: string, img: string, tags?: string[]} | null>(null);
   const [activeCategory, setActiveCategory] = useState('Pizze Rosse');
+  const [dietaryFilter, setDietaryFilter] = useState('Tous');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -108,7 +112,13 @@ export default function App() {
     }
   ];
 
-  const activeItems = menuCategories.find(c => c.name === activeCategory)?.items || [];
+  const activeItems = (menuCategories.find(c => c.name === activeCategory)?.items || []).filter(pizza => {
+    const matchesDietary = dietaryFilter === 'Tous' || (pizza.tags && pizza.tags.includes(dietaryFilter));
+    const matchesSearch = searchQuery === '' || 
+      pizza.desc.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      pizza.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesDietary && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen bg-[var(--color-dough)] text-[var(--color-ink)] font-sans overflow-x-hidden">
@@ -349,7 +359,7 @@ export default function App() {
             <p className="text-gray-500 max-w-2xl mx-auto mb-8">Découvrez nos spécialités, des classiques Pizze Rosse aux créations originales.</p>
             
             {/* Category Tabs */}
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
               {menuCategories.map((category) => (
                 <button
                   key={category.name}
@@ -364,57 +374,105 @@ export default function App() {
                 </button>
               ))}
             </div>
+
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-12 bg-gray-50 p-4 rounded-2xl max-w-4xl mx-auto">
+              <div className="flex items-center gap-3">
+                <Filter className="w-4 h-4 text-gray-400" />
+                <div className="flex gap-2">
+                  {['Tous', 'Végétarien', 'Végan'].map(filter => (
+                    <button
+                      key={filter}
+                      onClick={() => setDietaryFilter(filter)}
+                      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        dietaryFilter === filter 
+                          ? 'bg-[var(--color-basil)] text-white' 
+                          : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input 
+                  type="text"
+                  placeholder="Rechercher un ingrédient..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-[var(--color-pizza-red)] focus:ring-1 focus:ring-[var(--color-pizza-red)] bg-white"
+                />
+              </div>
+            </div>
           </div>
 
           <AnimatePresence mode="wait">
-            <motion.div 
-              key={activeCategory}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={staggerContainer}
-              className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {activeItems.map((pizza, i) => (
-                <motion.div 
-                  key={pizza.name} 
-                  variants={fadeIn} 
-                  className="group cursor-pointer bg-[var(--color-dough)] rounded-3xl p-4 hover:shadow-xl transition-shadow duration-300"
-                  onClick={() => setSelectedPizza(pizza)}
-                >
-                  <div className="aspect-[4/3] rounded-2xl overflow-hidden mb-6 relative">
-                    <img 
-                      src={pizza.img} 
-                      alt={pizza.name} 
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                      <button className="bg-white text-[var(--color-ink)] px-6 py-3 rounded-full font-semibold transform translate-y-4 group-hover:translate-y-0 transition-all">
-                        Voir les détails
-                      </button>
-                    </div>
-                  </div>
-                  <div className="px-2">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-serif text-2xl">{pizza.name}</h3>
-                      <span className="font-serif text-xl text-[var(--color-pizza-red)]">{pizza.price}</span>
-                    </div>
-                    {pizza.tags && pizza.tags.length > 0 && (
-                      <div className="flex gap-2 mb-3">
-                        {pizza.tags.map(tag => (
-                          <span key={tag} className="inline-flex items-center gap-1 text-[var(--color-basil)] text-xs font-semibold uppercase tracking-wider">
-                            <Leaf className="w-3 h-3" />
-                            {tag}
-                          </span>
-                        ))}
+            {activeItems.length > 0 ? (
+              <motion.div 
+                key={activeCategory + dietaryFilter + searchQuery}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                variants={staggerContainer}
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+              >
+                {activeItems.map((pizza, i) => (
+                  <motion.div 
+                    key={pizza.name} 
+                    variants={fadeIn} 
+                    className="group cursor-pointer bg-[var(--color-dough)] rounded-3xl p-4 hover:shadow-xl transition-shadow duration-300"
+                    onClick={() => setSelectedPizza(pizza)}
+                  >
+                    <div className="aspect-[4/3] rounded-2xl overflow-hidden mb-6 relative">
+                      <img 
+                        src={pizza.img} 
+                        alt={pizza.name} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                        <button className="bg-white text-[var(--color-ink)] px-6 py-3 rounded-full font-semibold transform translate-y-4 group-hover:translate-y-0 transition-all">
+                          Voir les détails
+                        </button>
                       </div>
-                    )}
-                    <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">{pizza.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+                    </div>
+                    <div className="px-2">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-serif text-2xl">{pizza.name}</h3>
+                        <span className="font-serif text-xl text-[var(--color-pizza-red)]">{pizza.price}</span>
+                      </div>
+                      {pizza.tags && pizza.tags.length > 0 && (
+                        <div className="flex gap-2 mb-3">
+                          {pizza.tags.map(tag => (
+                            <span key={tag} className="inline-flex items-center gap-1 text-[var(--color-basil)] text-xs font-semibold uppercase tracking-wider">
+                              <Leaf className="w-3 h-3" />
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">{pizza.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-12"
+              >
+                <p className="text-gray-500 text-lg">Aucune pizza ne correspond à vos critères de recherche.</p>
+                <button 
+                  onClick={() => { setDietaryFilter('Tous'); setSearchQuery(''); }}
+                  className="mt-4 text-[var(--color-pizza-red)] font-semibold hover:underline"
+                >
+                  Réinitialiser les filtres
+                </button>
+              </motion.div>
+            )}
           </AnimatePresence>
           
           <div className="text-center mt-16">
@@ -445,8 +503,8 @@ export default function App() {
       {/* Visit Us / Footer */}
       <footer id="contact" className="bg-[var(--color-dough)] pt-24 pb-12 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="grid md:grid-cols-4 gap-12 mb-16">
-            <div className="md:col-span-2">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12 mb-16">
+            <div className="md:col-span-2 lg:col-span-2">
               <div className="flex items-center gap-2 mb-6">
                 <Pizza className="w-8 h-8 text-[var(--color-pizza-red)]" />
                 <span className="font-serif text-2xl font-bold tracking-tight">
@@ -480,6 +538,20 @@ export default function App() {
                   <a href="tel:+33142230948" className="hover:text-[var(--color-pizza-red)] transition-colors">
                     +33 1 42 23 09 48
                   </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-serif text-xl mb-6">Horaires</h4>
+              <ul className="space-y-4 text-gray-600">
+                <li className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-[var(--color-pizza-red)] shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-[var(--color-ink)]">Lun - Dim</p>
+                    <p>12:00 - 14:30</p>
+                    <p>19:00 - 23:00</p>
+                  </div>
                 </li>
               </ul>
             </div>
