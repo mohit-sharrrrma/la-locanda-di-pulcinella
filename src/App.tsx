@@ -59,28 +59,28 @@ export default function App() {
         {
           name: "Margherita",
           desc: "Sauce tomate San Marzano, fior di latte, basilic frais, huile d'olive extra vierge.",
-          price: "13€",
+          price: "10€",
           img: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=2069&auto=format&fit=crop",
           tags: ["Végétarien"]
         },
         {
           name: "Margherita D.O.P",
           desc: "Sauce tomate San Marzano, mozzarella di bufala campana D.O.P, basilic frais, huile d'olive.",
-          price: "16€",
+          price: "14€",
           img: "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?q=80&w=1974&auto=format&fit=crop",
           tags: ["Végétarien"]
         },
         {
           name: "Vegetariana",
           desc: "Sauce tomate, fior di latte, légumes de saison grillés, huile d'olive.",
-          price: "15€",
+          price: "16€",
           img: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop",
           tags: ["Végétarien"]
         },
         {
           name: "Burratina",
           desc: "Sauce tomate, tomates cerises, burrata entière fraîche, roquette, huile d'olive.",
-          price: "18€",
+          price: "16€",
           img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop",
           tags: ["Végétarien"]
         }
@@ -92,7 +92,7 @@ export default function App() {
         {
           name: "Quattro Formaggi",
           desc: "Fior di latte, gorgonzola, provola fumée, parmigiano reggiano.",
-          price: "16€",
+          price: "15€",
           img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop",
           tags: ["Végétarien"]
         }
